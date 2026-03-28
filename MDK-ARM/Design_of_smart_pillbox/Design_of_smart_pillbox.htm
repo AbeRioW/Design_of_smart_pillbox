@@ -3,9 +3,9 @@
 <title>Static Call Graph - [Design_of_smart_pillbox\Design_of_smart_pillbox.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image Design_of_smart_pillbox\Design_of_smart_pillbox.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060750: Last Updated: Sat Mar 28 13:22:52 2026
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060750: Last Updated: Sat Mar 28 14:01:44 2026
 <BR><P>
-<H3>Maximum Stack Usage =        312 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
+<H3>Maximum Stack Usage =        360 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
 __rt_entry_main &rArr; main &rArr; Update_Time_Display &rArr; __2sprintf &rArr; _printf_char_common &rArr; __printf
 <P>
@@ -215,7 +215,7 @@ Global Symbols
 <P><STRONG><a name="[d7]"></a>__rt_entry_postsh_1</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, __rtentry2.o(.ARM.Collect$$rtentry$$00000009))
 
 <P><STRONG><a name="[47]"></a>__rt_entry_main</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, __rtentry2.o(.ARM.Collect$$rtentry$$0000000D))
-<BR><BR>[Stack]<UL><LI>Max Depth = 312 + Unknown Stack Size
+<BR><BR>[Stack]<UL><LI>Max Depth = 360 + Unknown Stack Size
 <LI>Call Chain = __rt_entry_main &rArr; main &rArr; Update_Time_Display &rArr; __2sprintf &rArr; _printf_char_common &rArr; __printf
 </UL>
 <BR>[Calls]<UL><LI><a href="#[48]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
@@ -620,7 +620,7 @@ Global Symbols
 <LI><a href="#[6a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_FLASHEx_Erase
 </UL>
 
-<P><STRONG><a name="[68]"></a>Flash_Write</STRONG> (Thumb, 66 bytes, Stack size 32 bytes, main.o(i.Flash_Write))
+<P><STRONG><a name="[68]"></a>Flash_Write</STRONG> (Thumb, 96 bytes, Stack size 32 bytes, main.o(i.Flash_Write))
 <BR><BR>[Stack]<UL><LI>Max Depth = 88<LI>Call Chain = Flash_Write &rArr; HAL_FLASH_Program &rArr; FLASH_WaitForLastOperation
 </UL>
 <BR>[Calls]<UL><LI><a href="#[69]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_FLASH_Unlock
@@ -1187,8 +1187,8 @@ Global Symbols
 <BR><BR>[Called By]<UL><LI><a href="#[51]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__printf
 </UL>
 
-<P><STRONG><a name="[48]"></a>main</STRONG> (Thumb, 1454 bytes, Stack size 112 bytes, main.o(i.main))
-<BR><BR>[Stack]<UL><LI>Max Depth = 312 + Unknown Stack Size
+<P><STRONG><a name="[48]"></a>main</STRONG> (Thumb, 1902 bytes, Stack size 160 bytes, main.o(i.main))
+<BR><BR>[Stack]<UL><LI>Max Depth = 360 + Unknown Stack Size
 <LI>Call Chain = main &rArr; Update_Time_Display &rArr; __2sprintf &rArr; _printf_char_common &rArr; __printf
 </UL>
 <BR>[Calls]<UL><LI><a href="#[b0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Update_Time_Display
