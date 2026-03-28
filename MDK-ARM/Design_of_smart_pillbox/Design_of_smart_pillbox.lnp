@@ -1,0 +1,27 @@
+--cpu Cortex-M3
+"design_of_smart_pillbox\startup_stm32f103xb.o"
+"design_of_smart_pillbox\main.o"
+"design_of_smart_pillbox\gpio.o"
+"design_of_smart_pillbox\usart.o"
+"design_of_smart_pillbox\stm32f1xx_it.o"
+"design_of_smart_pillbox\stm32f1xx_hal_msp.o"
+"design_of_smart_pillbox\stm32f1xx_hal_gpio_ex.o"
+"design_of_smart_pillbox\stm32f1xx_hal_uart.o"
+"design_of_smart_pillbox\stm32f1xx_hal.o"
+"design_of_smart_pillbox\stm32f1xx_hal_rcc.o"
+"design_of_smart_pillbox\stm32f1xx_hal_rcc_ex.o"
+"design_of_smart_pillbox\stm32f1xx_hal_gpio.o"
+"design_of_smart_pillbox\stm32f1xx_hal_dma.o"
+"design_of_smart_pillbox\stm32f1xx_hal_cortex.o"
+"design_of_smart_pillbox\stm32f1xx_hal_pwr.o"
+"design_of_smart_pillbox\stm32f1xx_hal_flash.o"
+"design_of_smart_pillbox\stm32f1xx_hal_flash_ex.o"
+"design_of_smart_pillbox\stm32f1xx_hal_exti.o"
+"design_of_smart_pillbox\system_stm32f1xx.o"
+"design_of_smart_pillbox\oled.o"
+"design_of_smart_pillbox\ds1302.o"
+"design_of_smart_pillbox\hx711.o"
+--strict --scatter "Design_of_smart_pillbox\Design_of_smart_pillbox.sct"
+--summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
+--info sizes --info totals --info unused --info veneers
+--list "Design_of_smart_pillbox.map" -o Design_of_smart_pillbox\Design_of_smart_pillbox.axf

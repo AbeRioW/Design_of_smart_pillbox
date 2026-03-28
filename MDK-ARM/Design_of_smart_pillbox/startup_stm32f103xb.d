@@ -1,0 +1,1 @@
+design_of_smart_pillbox\startup_stm32f103xb.o: startup_stm32f103xb.s
