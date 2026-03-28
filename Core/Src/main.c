@@ -52,6 +52,11 @@ uint8_t key1_pressed = 0;
 uint8_t key2_pressed = 0;
 uint8_t key3_pressed = 0;
 uint32_t weight_threshold = 100000;  // 全局阈值变量
+
+// 时间设置相关变量
+uint8_t setting_mode = 0;  // 0: 阈值设置, 1: 时间设置
+uint8_t time_setting_index = 0;  // 0:年, 1:月, 2:日, 3:时, 4:分, 5:秒
+DS1302_Time setting_time;  // 设置中的时间
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -182,9 +187,25 @@ int main(void)
     // Handle key interrupts
     if (key1_pressed) {
       key1_pressed = 0;
-      in_setting_mode = !in_setting_mode;
-      if (!in_setting_mode) {
-        Flash_Write(FLASH_USER_START_ADDR, weight_threshold);
+      if (in_setting_mode) {
+        // 退出设置模式
+        if (setting_mode == 0) {
+          Flash_Write(FLASH_USER_START_ADDR, weight_threshold);
+        } else if (setting_mode == 1) {
+          // 保存时间设置
+          DS1302_SetTime(&setting_time);
+        }
+        // 清除OLED显示
+        OLED_Clear();
+        OLED_Refresh();
+        in_setting_mode = 0;
+      } else {
+        // 进入设置模式
+        in_setting_mode = 1;
+        setting_mode = 0;  // 默认进入阈值设置
+        time_setting_index = 0;
+        // 读取当前时间作为初始值
+        DS1302_GetTime(&setting_time);
       }
       HAL_Delay(20);
     }
@@ -193,26 +214,110 @@ int main(void)
       // 处理设置模式下的按键
       if (key2_pressed) {
         key2_pressed = 0;
-        weight_threshold += 100000;
-        if (weight_threshold > 1000000) weight_threshold = 1000000;
-        Flash_Write(FLASH_USER_START_ADDR, weight_threshold);
+        if (setting_mode == 0) {
+          // 阈值设置
+          weight_threshold += 100000;
+          if (weight_threshold > 1000000) weight_threshold = 1000000;
+          Flash_Write(FLASH_USER_START_ADDR, weight_threshold);
+        } else if (setting_mode == 1) {
+          // 时间设置 - 增加当前项
+          switch (time_setting_index) {
+            case 0:  // 年
+              setting_time.year = (setting_time.year + 1) % 100;
+              break;
+            case 1:  // 月
+              setting_time.month = (setting_time.month % 12) + 1;
+              break;
+            case 2:  // 日
+              // 简单处理，实际应根据月份调整天数
+              setting_time.day = (setting_time.day % 31) + 1;
+              break;
+            case 3:  // 时
+              setting_time.hour = (setting_time.hour % 23) + 1;
+              break;
+            case 4:  // 分
+              setting_time.minute = (setting_time.minute % 59) + 1;
+              break;
+            case 5:  // 秒
+              setting_time.second = (setting_time.second % 59) + 1;
+              break;
+          }
+        }
         HAL_Delay(20);
       }
       
       if (key3_pressed) {
         key3_pressed = 0;
-        if (weight_threshold >= 100000) weight_threshold -= 100000;
-        Flash_Write(FLASH_USER_START_ADDR, weight_threshold);
+        if (setting_mode == 0) {
+          // 切换到时间设置模式
+          setting_mode = 1;
+          time_setting_index = 0;
+          // 读取当前时间作为初始值
+          DS1302_GetTime(&setting_time);
+        } else if (setting_mode == 1) {
+          // 时间设置 - 减少当前项或切换设置项
+          static uint32_t last_key3_time = 0;
+          if (HAL_GetTick() - last_key3_time < 300) {
+            // 短按：减少当前项
+            switch (time_setting_index) {
+              case 0:  // 年
+                setting_time.year = (setting_time.year + 99) % 100;
+                break;
+              case 1:  // 月
+                setting_time.month = (setting_time.month + 10) % 12 + 1;
+                break;
+              case 2:  // 日
+                setting_time.day = (setting_time.day + 29) % 31 + 1;
+                break;
+              case 3:  // 时
+                setting_time.hour = (setting_time.hour + 23) % 24;
+                break;
+              case 4:  // 分
+                setting_time.minute = (setting_time.minute + 59) % 60;
+                break;
+              case 5:  // 秒
+                setting_time.second = (setting_time.second + 59) % 60;
+                break;
+            }
+          } else {
+            // 长按：切换到下一个设置项
+            time_setting_index = (time_setting_index + 1) % 6;
+          }
+          last_key3_time = HAL_GetTick();
+        }
         HAL_Delay(20);
       }
       
       // 显示设置界面
       OLED_Clear();
-      OLED_ShowString(0, 0, (uint8_t*)"Setting Mode", 8, 1);
-      OLED_ShowString(0, 16, (uint8_t*)"Threshold:", 8, 1);
-      OLED_ShowNum(64, 16, weight_threshold, 6, 8, 1);  // 改为6位显示
-      OLED_ShowString(0, 24, (uint8_t*)"KEY2:+ KEY3:-", 8, 1);
-      OLED_ShowString(0, 32, (uint8_t*)"KEY1:Exit", 8, 1);
+      if (setting_mode == 0) {
+        // 阈值设置界面
+        OLED_ShowString(0, 0, (uint8_t*)"Setting Mode", 8, 1);
+        OLED_ShowString(0, 16, (uint8_t*)"Threshold:", 8, 1);
+        OLED_ShowNum(64, 16, weight_threshold, 6, 8, 1);
+        OLED_ShowString(0, 24, (uint8_t*)"KEY2:+ KEY3:-", 8, 1);
+        OLED_ShowString(0, 32, (uint8_t*)"KEY1:Exit", 8, 1);
+        OLED_ShowString(64, 32, (uint8_t*)"KEY3:Time", 8, 1);
+      } else if (setting_mode == 1) {
+        // 时间设置界面
+        OLED_ShowString(0, 0, (uint8_t*)"Time Setting", 8, 1);
+        
+        // 显示当前选中的项
+        const char* time_items[] = {"Year", "Month", "Day", "Hour", "Minute", "Second"};
+        OLED_ShowString(0, 16, (uint8_t*)"Current:", 8, 1);
+        OLED_ShowString(48, 16, (uint8_t*)time_items[time_setting_index], 8, 1);
+        
+        OLED_ShowString(0, 24, (uint8_t*)"KEY2:+ KEY3:-", 8, 1);
+        OLED_ShowString(64, 24, (uint8_t*)"Long KEY3:Next", 8, 1);
+        OLED_ShowString(0, 32, (uint8_t*)"KEY1:Save & Exit", 8, 1);
+        
+        // 显示当前设置的时间（在Exit下一行）
+        char time_str[30];
+        sprintf(time_str, "20%02d-%02d-%02d %02d:%02d:%02d", 
+                setting_time.year, setting_time.month, setting_time.day, 
+                setting_time.hour, setting_time.minute, setting_time.second);
+        OLED_ShowString(0, 40, (uint8_t*)time_str, 8, 1);
+      }
       OLED_Refresh();
       
       HAL_Delay(100);
