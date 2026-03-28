@@ -270,12 +270,13 @@ int main(void)
         HAL_GPIO_WritePin(BEEP_GPIO_Port, BEEP_Pin, GPIO_PIN_SET);
         alarm_active = 0;
       }
-			
-			    if (time_update_flag) {
-      time_update_flag = 0;
-      Update_Time_Display();
-			
-		        OLED_ShowString(0, 16, (uint8_t*)"A128:", 8, 1);
+      
+      // 更新时间显示
+      if (time_update_flag) {
+        time_update_flag = 0;
+        Update_Time_Display();
+        
+        OLED_ShowString(0, 16, (uint8_t*)"A128:", 8, 1);
         OLED_ShowNum(30, 16, weightA128, 8, 8, 1);
         
         OLED_ShowString(0, 24, (uint8_t*)"B32:", 8, 1);
@@ -287,45 +288,7 @@ int main(void)
         if (human_detected) {
           OLED_ShowString(64, 32, (uint8_t*)"Human", 8, 1);
         }
-    }
-      
-//      // 检查是否需要刷新显示（每秒刷新一次）
-//      if (HAL_GetTick() - last_display_time >= 1000) {
-//        last_display_time = HAL_GetTick();
-//        
-//        // 读取最新时间
-//        DS1302_GetTime(&time);
-//        
-//        OLED_Clear();
-//        
-//        OLED_ShowNum(0, 0, 20, 2, 8, 1);
-//        OLED_ShowNum(12, 0, time.year, 2, 8, 1);
-//        OLED_ShowChar(24, 0, '-', 8, 1);
-//        OLED_ShowNum(30, 0, time.month, 2, 8, 1);
-//        OLED_ShowChar(42, 0, '-', 8, 1);
-//        OLED_ShowNum(48, 0, time.day, 2, 8, 1);
-//        OLED_ShowChar(60, 0, ' ', 8, 1);
-//        OLED_ShowNum(66, 0, time.hour, 2, 8, 1);
-//        OLED_ShowChar(78, 0, ':', 8, 1);
-//        OLED_ShowNum(84, 0, time.minute, 2, 8, 1);
-//        OLED_ShowChar(96, 0, ':', 8, 1);
-//        OLED_ShowNum(102, 0, time.second, 2, 8, 1);
-//        
-//        OLED_ShowString(0, 16, (uint8_t*)"A128:", 8, 1);
-//        OLED_ShowNum(30, 16, weightA128, 8, 8, 1);
-//        
-//        OLED_ShowString(0, 24, (uint8_t*)"B32:", 8, 1);
-//        OLED_ShowNum(24, 24, rawB32, 8, 8, 1);
-//        
-//        OLED_ShowString(0, 32, (uint8_t*)"Th:", 8, 1);
-//        OLED_ShowNum(16, 32, weight_threshold, 6, 8, 1);
-//        
-//        if (human_detected) {
-//          OLED_ShowString(64, 32, (uint8_t*)"Human", 8, 1);
-//        }
-//        
-//        OLED_Refresh();
-//      }
+      }
       
       HAL_Delay(10);
     }
@@ -375,15 +338,12 @@ void SystemClock_Config(void)
 /* USER CODE BEGIN 4 */
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-  // 防抖动处理
-  HAL_Delay(20);
-  
-  // 再次检查按键状态，确保是真的按下
-  if (GPIO_Pin == KEY1_Pin && HAL_GPIO_ReadPin(KEY1_GPIO_Port, KEY1_Pin) == GPIO_PIN_RESET) {
+  // 直接设置标志，不在中断中使用HAL_Delay
+  if (GPIO_Pin == KEY1_Pin) {
     key1_pressed = 1;
-  } else if (GPIO_Pin == KEY2_Pin && HAL_GPIO_ReadPin(KEY2_GPIO_Port, KEY2_Pin) == GPIO_PIN_RESET) {
+  } else if (GPIO_Pin == KEY2_Pin) {
     key2_pressed = 1;
-  } else if (GPIO_Pin == KEY3_Pin && HAL_GPIO_ReadPin(KEY3_GPIO_Port, KEY3_Pin) == GPIO_PIN_RESET) {
+  } else if (GPIO_Pin == KEY3_Pin) {
     key3_pressed = 1;
   }
 }
