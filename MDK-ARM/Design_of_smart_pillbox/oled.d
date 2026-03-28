@@ -27,5 +27,7 @@ design_of_smart_pillbox\oled.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ha
 design_of_smart_pillbox\oled.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash.h
 design_of_smart_pillbox\oled.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h
 design_of_smart_pillbox\oled.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h
+design_of_smart_pillbox\oled.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h
+design_of_smart_pillbox\oled.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h
 design_of_smart_pillbox\oled.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h
 design_of_smart_pillbox\oled.o: ..\APP\oledfont.h

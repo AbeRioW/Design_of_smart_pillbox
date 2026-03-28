@@ -18,6 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 
@@ -128,6 +129,7 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART2_UART_Init();
+  MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
   OLED_Init();
   DS1302_Init();
@@ -161,6 +163,10 @@ int main(void)
   static uint32_t last_display_time = 0;
   
   OLED_Refresh();
+  
+  // 启动定时器1中断，每秒更新一次时间显示
+  HAL_TIM_Base_Start_IT(&htim1);
+  
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -170,6 +176,9 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+    // 检查时间更新标志，每秒更新一次时间显示
+
+    
     // Handle key interrupts
     if (key1_pressed) {
       key1_pressed = 0;
@@ -261,30 +270,12 @@ int main(void)
         HAL_GPIO_WritePin(BEEP_GPIO_Port, BEEP_Pin, GPIO_PIN_SET);
         alarm_active = 0;
       }
-      
-      // 检查是否需要刷新显示（每秒刷新一次）
-      if (HAL_GetTick() - last_display_time >= 1000) {
-        last_display_time = HAL_GetTick();
-        
-        // 读取最新时间
-        DS1302_GetTime(&time);
-        
-        OLED_Clear();
-        
-        OLED_ShowNum(0, 0, 20, 2, 8, 1);
-        OLED_ShowNum(12, 0, time.year, 2, 8, 1);
-        OLED_ShowChar(24, 0, '-', 8, 1);
-        OLED_ShowNum(30, 0, time.month, 2, 8, 1);
-        OLED_ShowChar(42, 0, '-', 8, 1);
-        OLED_ShowNum(48, 0, time.day, 2, 8, 1);
-        OLED_ShowChar(60, 0, ' ', 8, 1);
-        OLED_ShowNum(66, 0, time.hour, 2, 8, 1);
-        OLED_ShowChar(78, 0, ':', 8, 1);
-        OLED_ShowNum(84, 0, time.minute, 2, 8, 1);
-        OLED_ShowChar(96, 0, ':', 8, 1);
-        OLED_ShowNum(102, 0, time.second, 2, 8, 1);
-        
-        OLED_ShowString(0, 16, (uint8_t*)"A128:", 8, 1);
+			
+			    if (time_update_flag) {
+      time_update_flag = 0;
+      Update_Time_Display();
+			
+		        OLED_ShowString(0, 16, (uint8_t*)"A128:", 8, 1);
         OLED_ShowNum(30, 16, weightA128, 8, 8, 1);
         
         OLED_ShowString(0, 24, (uint8_t*)"B32:", 8, 1);
@@ -296,9 +287,45 @@ int main(void)
         if (human_detected) {
           OLED_ShowString(64, 32, (uint8_t*)"Human", 8, 1);
         }
-        
-        OLED_Refresh();
-      }
+    }
+      
+//      // 检查是否需要刷新显示（每秒刷新一次）
+//      if (HAL_GetTick() - last_display_time >= 1000) {
+//        last_display_time = HAL_GetTick();
+//        
+//        // 读取最新时间
+//        DS1302_GetTime(&time);
+//        
+//        OLED_Clear();
+//        
+//        OLED_ShowNum(0, 0, 20, 2, 8, 1);
+//        OLED_ShowNum(12, 0, time.year, 2, 8, 1);
+//        OLED_ShowChar(24, 0, '-', 8, 1);
+//        OLED_ShowNum(30, 0, time.month, 2, 8, 1);
+//        OLED_ShowChar(42, 0, '-', 8, 1);
+//        OLED_ShowNum(48, 0, time.day, 2, 8, 1);
+//        OLED_ShowChar(60, 0, ' ', 8, 1);
+//        OLED_ShowNum(66, 0, time.hour, 2, 8, 1);
+//        OLED_ShowChar(78, 0, ':', 8, 1);
+//        OLED_ShowNum(84, 0, time.minute, 2, 8, 1);
+//        OLED_ShowChar(96, 0, ':', 8, 1);
+//        OLED_ShowNum(102, 0, time.second, 2, 8, 1);
+//        
+//        OLED_ShowString(0, 16, (uint8_t*)"A128:", 8, 1);
+//        OLED_ShowNum(30, 16, weightA128, 8, 8, 1);
+//        
+//        OLED_ShowString(0, 24, (uint8_t*)"B32:", 8, 1);
+//        OLED_ShowNum(24, 24, rawB32, 8, 8, 1);
+//        
+//        OLED_ShowString(0, 32, (uint8_t*)"Th:", 8, 1);
+//        OLED_ShowNum(16, 32, weight_threshold, 6, 8, 1);
+//        
+//        if (human_detected) {
+//          OLED_ShowString(64, 32, (uint8_t*)"Human", 8, 1);
+//        }
+//        
+//        OLED_Refresh();
+//      }
       
       HAL_Delay(10);
     }
